@@ -25,7 +25,7 @@ const InvoiceSendPage = () => {
   const fetchApprovedBookings = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${BASE_URL}/admin/bookings/approved`, {
+      const response = await axios.get(`${BASE_URL}/admin/bookings/approved/`, {
         headers: {
           Authorization: `Bearer ${adminData.access_token}`,
         },
