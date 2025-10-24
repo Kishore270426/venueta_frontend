@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import HomePage from "./pages/Home";
-import LoginOptionsPage from "./pages/LoginOptionsPage";
+// import LoginOptionsPage from "./pages/LoginOptionsPage";
 import UserLoginPage from "./pages/user/UserLogin";
 import UserSignup from "./pages/user/UserSignup";
 
@@ -13,7 +13,7 @@ import AdminLayout from "./pages/Admin/AdminLayout";
 import DashHome from './pages/Admin/dashboard/Home';
 
 
-import Settings from './pages/Admin/dashboard/Settings';
+// import Settings from './pages/Admin/dashboard/Settings';
 import Logout from './pages/Admin/dashboard/Logout';
 import Bookings from "./pages/Admin/dashboard/Bookings";
 import Invoice from "./pages/Admin/dashboard/Invoice";
@@ -27,20 +27,35 @@ import Myhalls from "./pages/Admin/dashboard/Myhalls";
 import EditHall from "./pages/Admin/dashboard/EditHall";
 import BookingStatus from "./pages/user/dashboard/BookingStatus";
 import BookingDetails from "./pages/user/dashboard/BookingDetails";
-import Usersettings from "./pages/user/dashboard/Usersettings";
+import Test from "./test";
+import ForgotPassword from "./pages/UserForgotpass";
+import AdminForgotPassword from "./pages/AdminForgotpassword.jsx";
+// import Usersettings from "./pages/user/dashboard/Usersettings";
 
 const MainRouter = createBrowserRouter([
   {
     path: "/",
     element: <HomePage />,
   },
-  {
-    path: "/login-options",
-    element: <LoginOptionsPage />,
-  },
+  // {
+  //   path: "/login-options",
+  //   element: <LoginOptionsPage />,
+  // },
   {
     path: "/user-login",
     element: <UserLoginPage />,
+  },
+  {
+    path: "/user-forgotpassword",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/admin-forgotpassword",
+    element: <AdminForgotPassword />,
+  },
+    {
+    path: "/test",
+    element: <Test/>,
   },
   {
     path: "/user-signup",
@@ -75,7 +90,7 @@ const MainRouter = createBrowserRouter([
      
       { path: "invoice", element: <Invoice /> }, // Correct ✅
       { path: "subscriptions", element: <Subscriptions /> }, // Correct ✅
-      { path: "settings", element: <Settings /> }, // Correct ✅
+      // { path: "settings", element: <Settings /> }, // Correct ✅
       { path: "logout", element: <Logout /> }, // Correct ✅
     ],
   },  
@@ -89,7 +104,7 @@ const MainRouter = createBrowserRouter([
       { path: "bookingpage", element: <BookingPage /> }, // Correct ✅
       { path: "invoice", element: <Invoice /> }, // Correct ✅
       { path: "subscriptions", element: <Subscriptions /> }, // Correct ✅
-      { path: "usersettings", element: <Usersettings /> }, // Correct ✅
+      // { path: "usersettings", element: <Usersettings /> }, // Correct ✅
       { path: "user-logout", element: <UserLogoutPage /> }, // Correct ✅
     ],
   },

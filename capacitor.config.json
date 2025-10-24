@@ -1,0 +1,9 @@
+{
+  "appId": "com.vpearlsolutions.venueta",
+  "appName": "Venueta",
+  "webDir": "dist",
+  "server": {
+    "url": "https://venueta.vpearlsolutions.com/",
+    "cleartext": true
+  }
+}
