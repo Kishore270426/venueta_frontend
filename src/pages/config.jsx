@@ -1,4 +1,4 @@
-// const BASE_URL = 'http://192.168.1.7:8000';
+//const BASE_URL = 'http://127.0.0.1:8000';
 const BASE_URL = 'https://venueta.vpearlsolutions.com/api';
 // const BASE_URL = 'http://34.46.33.65:8080';
 

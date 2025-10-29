@@ -1,161 +1,295 @@
-// BookingStatus.jsx
-import React, { useState, useEffect,useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import BASE_URL from '../../config';
 import { UserContext } from "../../Context/UserContext";
+import { 
+  CalendarDaysIcon,
+  ClockIcon,
+  UserGroupIcon,
+  BuildingStorefrontIcon,
+  CheckCircleIcon,
+  ClockIcon as PendingIcon,
+  XMarkIcon,
+  DocumentTextIcon
+} from '@heroicons/react/24/outline';
 
 const BookingStatus = () => {
-  const { user } =useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [bookings, setBookings] = useState([]);
-  const [animate, setAnimate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
+        setLoading(true);
         const response = await fetch(`${BASE_URL}/hall/user/booking_status`, {
           method: 'GET',
           headers: {
-
             'Content-Type': 'application/json',
             Authorization: `Bearer ${user?.userAccessToken}`,
           },
         });
-        console.log(user?.userAccessToken);
+
         if (!response.ok) {
-          throw new Error('Failed to fetch booking status');
+          throw new Error('Failed to fetch bookings');
         }
 
         const data = await response.json();
         setBookings(data);
-        setLoading(false);
-        setTimeout(() => setAnimate(true), 100);
       } catch (err) {
         setError(err.message);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchBookings();
-  }, []);
+    if (user?.userAccessToken) {
+      fetchBookings();
+    }
+  }, [user?.userAccessToken]);
+
+  const getStatusVariant = (status) => {
+    const statusLower = status?.toLowerCase();
+    switch (statusLower) {
+      case 'approved':
+        return {
+          color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+          icon: CheckCircleIcon,
+          dot: 'bg-emerald-500'
+        };
+      case 'pending':
+        return {
+          color: 'bg-amber-100 text-amber-800 border-amber-200',
+          icon: PendingIcon,
+          dot: 'bg-amber-500'
+        };
+      default:
+        return {
+          color: 'bg-red-100 text-red-800 border-red-200',
+          icon: XMarkIcon,
+          dot: 'bg-red-500'
+        };
+    }
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 text-lg">Loading your bookings...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-600"></div>
+          <p className="mt-4 text-gray-600 font-medium">Loading bookings...</p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || bookings.length === 0) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <div className="text-center">
-          <svg className="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p className="mt-4 text-red-600 text-lg">Error: {error}</p>
-          <p className="mt-2 text-gray-500">Please try again later</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md text-center">
+          <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+            <BuildingStorefrontIcon className="w-12 h-12 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Bookings Found</h3>
+          <p className="text-gray-600 mb-6">
+            You haven't made any bookings yet. Start by reserving a hall.
+          </p>
+          <button className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+            Book a Hall
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white  sm:p-6">
-      <div className="max-w-5xl mx-auto">
-
-        <div className="bg-purple-700 text-white text-center py-4">
-          <h1 className="text-2xl sm:text-3xl font-bold">My Bookings</h1>
-        </div>
-
-        {bookings.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)]">
-            <svg className="w-20 h-20 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>
-            <p className="text-xl font-semibold text-gray-700 mb-2">No Bookings Found</p>
-            <p className="text-gray-500 text-center max-w-md">
-              You haven't booked any halls yet. Start by making a reservation to see your bookings here!
-            </p>
-            <button className="mt-6 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-md">
-              Book a Hall
-            </button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <motion.header 
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className="bg-white shadow-sm border-b border-gray-200"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">My Bookings</h1>
+              <p className="mt-1 text-sm text-gray-500">{bookings.length} active reservation{bookings.length !== 1 ? 's' : ''}</p>
+            </div>
+            <div className="mt-4 sm:mt-0">
+              <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                New Booking
+              </button>
+            </div>
           </div>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 p-4 ">
-            {bookings.map((booking) => (
-              <div
-                key={booking.booking_id}
-                className=" rounded-xl p-5 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100"
-              >
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text mb-2">
-                  {booking.hall_name}
-                </h3>
-                <p className="text-sm text-gray-500 mb-3">{booking.function_type}</p>
+        </div>
+      </motion.header>
 
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span>
-                      {booking.function_start_date}
-                      {booking.function_start_date !== booking.function_end_date && ` - ${booking.function_end_date}`}
-                    </span>
-                  </div>
-
-                  {!booking.full_day_slot && (
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>{booking.start_time.slice(0, 5)} - {booking.end_time.slice(0, 5)}</span>
-                    </div>
-                  )}
-
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 1.857h10M12 4a8 8 0 100 16 8 8 0 000-16z" />
-                    </svg>
-                    <span>{booking.minimum_people_coming} - {booking.maximum_people_coming} guests</span>
-                  </div>
-
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h-2m-6 0H9m-6 0h2" />
-                    </svg>
-                    <span>{booking.no_of_rooms_booked} rooms</span>
-                  </div>
-
-                  <p className="text-gray-500">Details: {booking.additional_details}</p>
-                  <p className="text-gray-600 font-medium">
-                    ₹{booking.total_price.toLocaleString()} + GST ₹{booking.gst.toLocaleString()}
-                  </p>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Summary Cards */}
+          <motion.aside 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-1 space-y-6"
+          >
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-sm font-medium text-gray-900 mb-4">Booking Summary</h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Total Bookings</span>
+                  <span className="text-lg font-semibold text-gray-900">{bookings.length}</span>
                 </div>
-
-                <div className="mt-4">
-                  <button
-                    className={`w-full py-2 rounded-full text-sm font-medium capitalize transition-all duration-300 shadow-md ${booking.status.toLowerCase() === "pending"
-                      ? "bg-gradient-to-r from-gray-200 to-gray-300 text-gray-700 hover:from-gray-300 hover:to-gray-400"
-                      : booking.status.toLowerCase() === "approved"
-                        ? "bg-gradient-to-r from-green-400 to-green-500 text-white hover:from-green-500 hover:to-green-600"
-                        : "bg-gradient-to-r from-red-400 to-red-500 text-white hover:from-red-500 hover:to-red-600"
-                      }`}
-                  >
-                    {booking.status}
-                  </button>
-
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Approved</span>
+                  <span className="text-lg font-semibold text-emerald-600">
+                    {bookings.filter(b => b.status?.toLowerCase() === 'approved').length}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Pending</span>
+                  <span className="text-lg font-semibold text-amber-600">
+                    {bookings.filter(b => b.status?.toLowerCase() === 'pending').length}
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-sm font-medium text-gray-900 mb-4">Quick Actions</h3>
+              <div className="space-y-3">
+                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                  <span className="font-medium text-gray-900">View Invoice</span>
+                </button>
+                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                  <span className="font-medium text-gray-900">Cancel Booking</span>
+                </button>
+                <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                  <span className="font-medium text-gray-900">Contact Support</span>
+                </button>
+              </div>
+            </div>
+          </motion.aside>
+
+          {/* Bookings List */}
+          <motion.section 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-2"
+          >
+            <AnimatePresence>
+              {bookings.map((booking, index) => {
+                const statusVariant = getStatusVariant(booking.status);
+                const StatusIcon = statusVariant.icon;
+                
+                return (
+                  <motion.div
+                    key={booking.booking_id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ 
+                      scale: 1.02,
+                      boxShadow: "0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
+                    }}
+                    className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6 hover:border-gray-300 transition-all duration-200"
+                  >
+                    {/* Header */}
+                    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">{booking.hall_name}</h3>
+                          <p className="text-sm text-gray-500 mt-1">{booking.function_type}</p>
+                        </div>
+                        <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium ${statusVariant.color}`}>
+                          <div className={`w-2 h-2 rounded-full ${statusVariant.dot}`}></div>
+                          <StatusIcon className="w-4 h-4" />
+                          <span>{booking.status}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        {/* Date & Time */}
+                        <div className="space-y-3">
+                          <div className="flex items-center">
+                            <CalendarDaysIcon className="w-5 h-5 text-gray-400 mr-3" />
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                {booking.function_start_date}
+                                {booking.function_start_date !== booking.function_end_date && ` - ${booking.function_end_date}`}
+                              </p>
+                              {!booking.full_day_slot && (
+                                <p className="text-sm text-gray-500">
+                                  {booking.start_time.slice(0, 5)} - {booking.end_time.slice(0, 5)}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Capacity & Rooms */}
+                        <div className="space-y-3">
+                          <div className="flex items-center">
+                            <UserGroupIcon className="w-5 h-5 text-gray-400 mr-3" />
+                            <span className="text-sm text-gray-900">
+                              {booking.minimum_people_coming} - {booking.maximum_people_coming} guests
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <BuildingStorefrontIcon className="w-5 h-5 text-gray-400 mr-3" />
+                            <span className="text-sm text-gray-900">
+                              {booking.no_of_rooms_booked} room{booking.no_of_rooms_booked !== 1 ? 's' : ''}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Details & Pricing */}
+                      <div className="border-t border-gray-200 pt-4">
+                        {booking.additional_details && (
+                          <div className="mb-4">
+                            <p className="text-sm text-gray-500 mb-2 flex items-center">
+                              <DocumentTextIcon className="w-4 h-4 mr-2 text-gray-400" />
+                              Additional Details
+                            </p>
+                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{booking.additional_details}</p>
+                          </div>
+                        )}
+                        
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end">
+                          <div className="text-sm text-gray-500 mb-2 sm:mb-0">
+                            Total: ₹{booking.total_price.toLocaleString()} + GST ₹{booking.gst.toLocaleString()}
+                          </div>
+                          <div className="text-2xl font-bold text-gray-900">
+                            ₹{(booking.total_price + booking.gst).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                      <div className="flex space-x-3">
+                        <button className="flex-1 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                          View Details
+                        </button>
+                        <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                          Invoice
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </motion.section>
+        </div>
+      </main>
     </div>
   );
 };

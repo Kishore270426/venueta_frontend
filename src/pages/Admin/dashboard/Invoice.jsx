@@ -21,7 +21,6 @@ const InvoiceSendPage = () => {
   });
   const navigate = useNavigate();
 
-  // Fetch Approved Bookings
   const fetchApprovedBookings = async () => {
     setLoading(true);
     try {
@@ -115,7 +114,7 @@ const InvoiceSendPage = () => {
           </div>
         ) : approvedBookings.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow-md">
-            <p className="text-xl font-semibold text-gray-700">No Approved Bookings Found</p>
+            <p className="text-xl font-semibold text-gray-700">No Approved Bookings </p>
             <p className="text-gray-500 mt-2">Please wait for approved bookings to send invoices.</p>
           </div>
         ) : (

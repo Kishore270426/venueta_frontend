@@ -3,13 +3,15 @@ import Sidebar from "./dashboard/Sidebar";
 
 const UserLayout = () => {
   return (
-    <div className="flex min-h-screen ">
+    <div className="">
       {/* Sidebar */}
       <Sidebar />
       
       {/* Main Content */}
-      <div className="flex-1  sm:p-10">
-        <Outlet /> {/* Renders the child components */}
+      <div className="">
+        <div className="">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

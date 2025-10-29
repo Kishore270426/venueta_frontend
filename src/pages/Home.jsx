@@ -1,72 +1,127 @@
-import React, { useState } from "react";
+// HomePage.js
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import homebgimage from "../assets/homebgimage.jpg";
-import { FaCalendarAlt } from "react-icons/fa";
+import BackgroundElements from "./Homecomponents/BackgroundElements";
+import DesktopView from "./Homecomponents/DesktopView";
+import MobileView from "./Homecomponents/MobileView";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [showLoginOptions, setShowLoginOptions] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const handleGetStarted = () => {
+    setShowLoginOptions(true);
+  };
+
+  const handleLoginClick = (path) => {
+    const element = document.querySelector('.login-options-container');
+    if (element) {
+      element.style.transform = 'translateX(100px)';
+      element.style.opacity = '0';
+    }
+    setTimeout(() => navigate(path), 300);
+  };
 
   return (
-    <div
-      className="h-screen w-full bg-cover bg-center relative transition-opacity duration-500"
-      style={{
-        backgroundImage: `url(${homebgimage})`,
-        opacity: imageLoaded ? 1 : 0, 
-      }}
-    >
-      {/* Preload the image */}
-      <img
-        src={homebgimage}
-        alt="Background"
-        className="hidden"
-        onLoad={() => setImageLoaded(true)}
+    <div className="min-h-screen bg-gradient-to-br from-purple-200 via-purple-400 to-purple-500 text-white overflow-hidden relative">
+      <BackgroundElements />
+      
+      <DesktopView
+        showLoginOptions={showLoginOptions}
+        setShowLoginOptions={setShowLoginOptions}
+        handleGetStarted={handleGetStarted}
+        handleLoginClick={handleLoginClick}
       />
 
-      {/* Overlay using absolute positioning */}
-      {imageLoaded && (
-        <div className="absolute inset-0 bg-black opacity-60 z-0"></div>
-      )}
+      <MobileView
+        showLoginOptions={showLoginOptions}
+        setShowLoginOptions={setShowLoginOptions}
+        handleGetStarted={handleGetStarted}
+        handleLoginClick={handleLoginClick}
+      />
 
-      {/* Centered content */}
-      <div
-        className={`relative z-10 flex flex-col items-center justify-center text-center space-y-6 px-4 h-full transition-all duration-700 ${
-          imageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
-        }`}
-      >
-        <FaCalendarAlt className="text-white text-6xl md:text-8xl drop-shadow-lg animate-bounce" />
-        <h1 className="text-3xl md:text-6xl font-extrabold text-white drop-shadow-lg">
-          Step Into the Realm of Vpearl Venuta – Where Legendary Events Unfold
-        </h1>
-
-        <p className="text-base md:text-xl lg:text-2xl text-white max-w-2xl">
-          Step into the shadows and book your next grand event at Vpearl Venuta. Discover spaces with power, mystery, and elegance, all tailored to your vision.
-        </p>
-        <button
-          className="px-8 md:px-10 py-3 md:py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-lg md:text-xl font-semibold rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transform transition duration-300"
-          onClick={() => navigate("/login-options")}
-        >
-          Get Started
-        </button>
-      </div>
-
-      {/* Footer */}
-      {imageLoaded && (
-        <div className="absolute bottom-0 w-full text-center py-4 bg-black bg-opacity-60 hidden md:flex justify-center items-center gap-4">
-          <p className="text-white text-xs md:text-sm">
-            © 2025 Vpearl Venuta. All rights reserved.
-          </p>
-          <a href="/privacy-policy" className="text-white text-xs md:text-sm hover:underline">
-            Privacy Policy
-          </a>
-          <span className="text-white">|</span>
-          <a href="/terms-and-conditions" className="text-white text-xs md:text-sm hover:underline">
-            Terms & Conditions
-          </a>
-        </div>
-      )}
+      <CustomStyles />
     </div>
   );
 };
+
+// Custom Styles Component
+const CustomStyles = () => (
+  <style jsx>{`
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    @keyframes float-delayed {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(5deg); }
+    }
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-10px) scale(1.05); }
+    }
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 0.1; }
+      50% { opacity: 0.2; }
+    }
+    @keyframes pulse-slower {
+      0%, 100% { opacity: 0.05; }
+      50% { opacity: 0.15; }
+    }
+    @keyframes pulse-delayed {
+      0%, 100% { opacity: 0.08; }
+      50% { opacity: 0.12; }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+    .animate-slideUp {
+      animation: slideUp 0.6s ease-out forwards;
+    }
+    .animate-slideInRight {
+      animation: slideInRight 0.7s ease-out forwards;
+    }
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+    .animate-float-delayed {
+      animation: float-delayed 8s ease-in-out infinite;
+    }
+    .animate-float-slow {
+      animation: float-slow 10s ease-in-out infinite;
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 8s ease-in-out infinite;
+    }
+    .animate-pulse-slower {
+      animation: pulse-slower 12s ease-in-out infinite;
+    }
+    .animate-pulse-delayed {
+      animation: pulse-delayed 10s ease-in-out infinite;
+    }
+  `}</style>
+);
 
 export default HomePage;
